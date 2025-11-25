@@ -1,23 +1,22 @@
 'use client';
-
+import { supabase } from "@/lib/supabaseClient";
 import { useState, useEffect } from 'react';
 
 function Total() {
-    const [total, setTotal] = useState([]);
+    const [total, setTotal] = useState<number>(0);
 
     useEffect(() => {
-        async function getTotal() {
-            try {
-                const res = await fetch('https://api.sheetbest.com/sheets/d9af5cd8-e4ed-40c1-98aa-2d97bebd15ef');
-                const data = await res.json();
-                const biggie = data.length;
-                setTotal(biggie);
-            } catch(err) {
-                console.error(err);
+        async function fetchTotal() {
+            const { data, error } = await supabase
+                .from("timestamp")
+                .select("*");
+            if(error) {
+                console.error("Error fetching timestamps:", error);
+                return;
             }
+            setTotal(data.length)
         }
-
-        getTotal();
+        fetchTotal();
     }, [])
     return (
         <div className="fixed bottom-10 right-10 border rounded-2xl py-2 px-3 cursor-pointer hover:bg-zinc-900 opacity-75">
